@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import {useCart} from './ShopContext';
+import {useState} from 'react';
 const MyCart = ({navigation}) => {
   const {
     cartItems,
@@ -33,10 +34,26 @@ const MyCart = ({navigation}) => {
     setPhoneNumber,
     handleOrderNow,
     orderConfirmed,
+
+    handleDiscountCodeInput,
+    isDiscountApplied,
+    applyDiscount,
+    coupendiscount,
+
+    saveDataToStorage,
   } = useCart();
+
+  const [discountCode, setDiscountCode] = useState('');
+  const onApplyDiscount = () => {
+    applyDiscount(discountCode);
+    // Clear the input field or take other actions as needed
+    setDiscountCode('');
+  };
 
   const renderItemButton = item => {
     const cartItem = cartItems.find(cartItem => cartItem.id === item.id);
+
+    // Discount...............................
 
     if (cartItem) {
       return (
@@ -300,6 +317,48 @@ const MyCart = ({navigation}) => {
 
       <View
         style={{
+          width: '100%',
+          height: 70,
+          // backgroundColor: 'yellow',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View
+          style={{
+            width: '90%',
+            height: '70%',
+            backgroundColor: 'white',
+            // elevation: 10,
+            // shadowColor: 'rgba(0, 0, 0, 0.4)',
+            borderRadius: 10,
+            flexDirection: 'row',
+            justifyContent: 'center',
+          }}>
+          <TextInput
+            style={{flex: 1, fontSize: 14, color: 'black', paddingLeft: 15}}
+            placeholder="Enter Discount Code"
+            placeholderTextColor="gray"
+            value={discountCode}
+            onChangeText={text => setDiscountCode(text)}
+          />
+          <TouchableOpacity
+            style={{
+              width: 70,
+              height: '100%',
+              backgroundColor: '#ff6600',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={onApplyDiscount}>
+            <Text style={{fontSize: 14, color: 'white', fontWeight: '600'}}>
+              Apply
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View
+        style={{
           alignItems: 'center',
           width: '100%',
           height: 70,
@@ -324,7 +383,7 @@ const MyCart = ({navigation}) => {
               fontWeight: '600',
               // marginTop:20,
               color: 'black',
-              marginLeft: 80,
+              // marginLeft: 80,
             }}>
             Total Amount Your Cart
           </Text>
@@ -340,7 +399,7 @@ const MyCart = ({navigation}) => {
               // marginTop:20,
               marginLeft: 10,
             }}>
-            ₹ {totalAmount()}
+            ₹{coupendiscount()}
           </Text>
         </View>
       </View>
@@ -394,15 +453,25 @@ const MyCart = ({navigation}) => {
               borderColor: '#ff9900',
               borderWidth: 0.6,
             }}>
-              <View style={{width:'100%',height:25,flexDirection:'row'}}>
-                <TouchableOpacity onPress={toggleSecondModal} style={{marginLeft:30}}>
-                  <Image style={{width:30,height:30}} source={require('../imgs/back.png')}/>
+            <View style={{width: '100%', height: 25, flexDirection: 'row'}}>
+              <TouchableOpacity
+                onPress={toggleSecondModal}
+                style={{marginLeft: 30}}>
+                <Image
+                  style={{width: 30, height: 30}}
+                  source={require('../imgs/back.png')}
+                />
+              </TouchableOpacity>
 
-                </TouchableOpacity>
-             
-            <Text style={{color: 'white',marginLeft:35, fontWeight: 'bold', fontSize: 20}}>
-              Order Details
-            </Text>
+              <Text
+                style={{
+                  color: 'white',
+                  marginLeft: 35,
+                  fontWeight: 'bold',
+                  fontSize: 20,
+                }}>
+                Order Details
+              </Text>
             </View>
             <View
               style={{
@@ -492,6 +561,7 @@ const MyCart = ({navigation}) => {
                   }}
                   placeholder="Phone Number"
                   placeholderTextColor="gray"
+                  keyboardType="phone-pad"
                   value={phoneNumber}
                   onChangeText={text => setPhoneNumber(text)}
                 />
@@ -516,8 +586,6 @@ const MyCart = ({navigation}) => {
             {orderConfirmed && (
               <Text style={{color: 'green'}}>Order is confirmed!</Text>
             )}
-
-            
           </View>
         </View>
       </Modal>

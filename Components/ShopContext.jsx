@@ -1,13 +1,17 @@
-const {datas, secnddatas} = require('../Components/Data');
-import {useState, createContext, useEffect} from 'react';
+import React, {useState, createContext, useEffect} from 'react';
 import {useContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {datas} from './Data';
+import {secnddatas} from './Data';
 
 export const CartContext = createContext();
 
-const allProdects = [...datas, ...secnddatas];
+const allProducts = [...datas, ...secnddatas];
 
 export const CartProvider = ({children}) => {
+  const [discountCode, setDiscountCode] = useState('');
+  const [isDiscountApplied, setIsDiscountApplied] = useState(false);
+  const [storedData, setStoredData] = useState(null);
   const [user, setUser] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,13 +20,24 @@ export const CartProvider = ({children}) => {
 
   const [showpopup, setShowPopup] = useState(false);
 
-
+  const [yourOrdersData, setYourOrderData] = useState(false);
 
   const [isSecondModalVisible, setSecondModalVisible] = useState(false);
   const toggleSecondModal = () => {
     setSecondModalVisible(!isSecondModalVisible);
   };
 
+  const openOrderDataPopup = () => {
+    setYourOrderData(!yourOrdersData);
+  };
+
+  const applyDiscount = code => {
+    if (code === 'inexoft50') {
+      setIsDiscountApplied(true);
+    } else {
+      setIsDiscountApplied(false);
+    }
+  };
 
   const addToCart = productId => {
     setShowPopup(true);
@@ -30,7 +45,9 @@ export const CartProvider = ({children}) => {
       setShowPopup(false);
     }, 1000);
 
-    const productToAdd = allProdects.find(product => product.id === productId);
+    const productToAdd = allProducts.find(product => product.id === productId);
+    console.log('mridhu', allProducts);
+    console.log('hello', productToAdd);
 
     if (productToAdd) {
       const existingItems = cartItems.find(item => item.id === productId);
@@ -51,6 +68,8 @@ export const CartProvider = ({children}) => {
     }
   };
 
+  console.log(cartItems, 'hggfrttyy');
+
   const decreaseQuantity = productId => {
     setCartItems(prevCartItems =>
       prevCartItems
@@ -62,6 +81,7 @@ export const CartProvider = ({children}) => {
         .filter(item => item.quantity > 0),
     );
   };
+
   const totalAmount = () => {
     return cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
@@ -69,11 +89,26 @@ export const CartProvider = ({children}) => {
     );
   };
 
+  const coupendiscount = () => {
+    const total1 = totalAmount();
+    const discountAmount = 50;
 
-//CArt popup Validation..........................................................
+    if (isDiscountApplied) {
+      var totalAmount1 = total1 - discountAmount;
+      return totalAmount1;
+    } else {
+      return total1;
+    }
+  };
 
+  const handleDiscountCodeInput = code => {
+    setDiscountCode(code);
+    applyDiscount(code);
+  };
 
-const [name, setName] = useState('');
+  let price = coupendiscount();
+
+  const [name, setName] = useState('');
   const [place, setPlace] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [nameError, setNameError] = useState('');
@@ -101,18 +136,37 @@ const [name, setName] = useState('');
       }
     }
 
-    // If all validations pass, set orderConfirmed to true and disable further validation.
     if (name && place && phoneNumber) {
       setOrderConfirmed(true);
       setValidationEnabled(false);
-      // You can add more logic here, like submitting the order.
     }
+    saveDataToStorage(name, phoneNumber, place);
   };
 
+  const saveDataToStorage = async userDetails => {
+    try {
+      const dataToStore = {
+        user: userDetails,
+        cartItems: cartItems,
+        price: price,
+        place: place,
+        phoneNumber: phoneNumber,
+      };
 
+      const existingUsers = await AsyncStorage.getItem('userData');
+      let users = [];
 
+      if (existingUsers) {
+        users = JSON.parse(existingUsers);
+      }
 
-  // localstoragestarting..............................................................
+      users.push(dataToStore);
+
+      await AsyncStorage.setItem('userData', JSON.stringify(users));
+    } catch (error) {
+      console.error('Error saving user to AsyncStorage:', error);
+    }
+  };
 
   const saveCartToAsyncStorage = async () => {
     try {
@@ -122,10 +176,23 @@ const [name, setName] = useState('');
     }
   };
 
-  //  AsyncStorage
+  const retrieveDataFromStorage = async () => {
+    try {
+      var BillingData = await AsyncStorage.getItem('userData');
+      if (BillingData !== null) {
+        const parsedData = JSON.parse(BillingData);
+        setStoredData(parsedData);
+        return parsedData;
+      }
+    } catch (error) {
+      console.error('Error retrieving data from AsyncStorage: ', error);
+    }
+  };
+
   const retrieveCartFromAsyncStorage = async () => {
     try {
       const storedCart = await AsyncStorage.getItem('@MyCart:key');
+      console.log('storedCart', storedCart);
       if (storedCart !== null) {
         setCartItems(JSON.parse(storedCart));
       }
@@ -134,8 +201,6 @@ const [name, setName] = useState('');
     }
   };
 
-  
-  // localstorage
   useEffect(() => {
     retrieveCartFromAsyncStorage();
   }, []);
@@ -143,8 +208,6 @@ const [name, setName] = useState('');
   useEffect(() => {
     saveCartToAsyncStorage();
   }, [cartItems]);
-
-  // locastorage.............................................................................
 
   return (
     <CartContext.Provider
@@ -163,7 +226,7 @@ const [name, setName] = useState('');
         showpopup,
         toggleSecondModal,
         isSecondModalVisible,
-allProdects,
+        allProducts, // Changed from 'allProdects' to 'allProducts'
 
         setName,
         name,
@@ -177,12 +240,25 @@ allProdects,
         phoneNumber,
         setPhoneNumber,
         handleOrderNow,
-        orderConfirmed, 
+        orderConfirmed,
+
+        handleDiscountCodeInput,
+        isDiscountApplied,
+        applyDiscount,
+        coupendiscount,
+
+        saveDataToStorage,
+        retrieveDataFromStorage,
+        storedData,
+
+        openOrderDataPopup,
+        yourOrdersData,
       }}>
       {children}
     </CartContext.Provider>
   );
 };
+
 export const useCart = () => {
   return useContext(CartContext);
 };

@@ -1,14 +1,13 @@
-import {Image, Modal, StyleSheet, Text, View,SectionList} from 'react-native';
+import {Image, Modal, StyleSheet, Text, View} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import { debounce } from 'lodash';
+
 import Carousel from 'react-native-snap-carousel';
 import {
   FlatList,
   ScrollView,
   TextInput,
   TouchableOpacity,
-  sect
 } from 'react-native-gesture-handler';
 import {datas, secnddatas} from './Data';
 import {useCart} from './ShopContext';
@@ -20,46 +19,35 @@ const CarouselItem = ({item}) => (
 );
 
 const Home = ({navigation}) => {
-  const {addToCart, cartItems, user, setShowPopup, showpopup, email,allProdects} =
-    useCart();
-  console.log(cartItems);
+  const {
+    addToCart,
+    cartItems,
+    user,
+    setShowPopup,
+    showpopup,
+    email,
+    allProdects,
+  } = useCart();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredRows, setFilteredRows] = useState(datas);
+
+  const handleSearch = text => {
+    console.log('dddd', text);
+    const inputQuery = text.toLowerCase();
+    const filteredRows = datas.filter(row =>
+      row.name.toLowerCase().includes(inputQuery),
+    );
+    setFilteredRows(filteredRows);
+    setSearchQuery(text);
+    console.log('andi:', searchQuery);
+  };
 
   const [isModalVisible, setModalVisible] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
-
-  // Searching Filter.................
- 
-
-  const [query, setQuery] = useState('');
-  const [filterData, setFilterData] = useState([]);
- 
-console.log(query);
-  const hadleSearch = text => {
-    setQuery(text)
- 
-    
-  };
-
-
-    // Filter the data based on the query
-    useEffect(() => {
-      // Filter the data based on the query
-   let updateData =datas.filter((item) => {
-    return item.name.includes(query)
-  })
- 
- setFilterData(updateData)
-     
-                                       
-      
-    }, [query,datas]);
-
-
-console.log( typeof filterData);
-
 
   return (
     <View>
@@ -275,7 +263,7 @@ console.log( typeof filterData);
                   </View>
                 </View>
                 <TouchableWithoutFeedback
-                  onPress={() => navigation.navigate('MyCart')}>
+                  onPress={() => navigation.navigate('Myorders')}>
                   <View
                     style={{
                       width: '100%',
@@ -530,8 +518,8 @@ console.log( typeof filterData);
             }}
             placeholder="Search for food items..."
             placeholderTextColor="gray"
-            value={query}
-            onChange={hadleSearch}
+            value={searchQuery}
+            onChangeText={text => handleSearch(text)}
           />
           <View
             style={{
@@ -677,10 +665,13 @@ console.log( typeof filterData);
           </View>
         </View>
         <View>
-  <FlatList
-            numColumns={3}
+          <FlatList
+            data={filteredRows}
+            // renderItem={renderItem}
+            // keyExtractor={(item) => item.id.toString()}
 
-            data={filterData.length > 0 ? filterData : datas}
+            numColumns={3}
+            // data={rows.length > 0 ? filterData : datas}
 
             keyExtractor={item => item.id.toString()}
             style={{backgroundColor: 'white'}}
