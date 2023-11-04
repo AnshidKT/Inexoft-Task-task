@@ -28,7 +28,10 @@ const Home = ({navigation}) => {
     email,
     allProdects,
   } = useCart();
-
+  const [isModalVisible, setModalVisible] = useState(false);
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredRows, setFilteredRows] = useState(datas);
 
@@ -43,15 +46,6 @@ const Home = ({navigation}) => {
     console.log('andi:', searchQuery);
   };
 
-
-
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-
-  
   return (
     <View>
       <View
@@ -633,49 +627,6 @@ const Home = ({navigation}) => {
             />
           </View>
         </ScrollView>
-
-        <TouchableWithoutFeedback
-          onPress={() => navigation.navigate('Myorders')}>
-          <View
-            style={{
-              width: '100%',
-              height: 70,
-              borderBottomWidth: 1,
-              // backgroundColor: 'gray',
-              borderBottomColor: '#f2f2f2',
-            }}>
-            <View
-              style={{
-                width: '50%',
-                height: '100%',
-                // backgroundColor: 'black',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                flexDirection: 'row',
-              }}>
-              <View
-                style={{
-                  width: 60,
-                  height: '100%',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Image
-                  style={{width: 30, height: 30}}
-                  source={require('../imgs/order-img.png')}
-                />
-              </View>
-              <Text
-                style={{
-                  color: '#262626',
-                  fontSize: 15,
-                  fontWeight: '500',
-                }}>
-                Your orders
-              </Text>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
 
         <View
           style={{

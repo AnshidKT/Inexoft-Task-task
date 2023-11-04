@@ -137,15 +137,15 @@ export const CartProvider = ({children}) => {
     }
 
     if (name && place && phoneNumber) {
-      setOrderConfirmed(true);
       setValidationEnabled(false);
       saveDataToStorage(name, phoneNumber, place);
-      // Clear the input fields
+      setOrderConfirmed(true);
       setName('');
       setPlace('');
       setPhoneNumber('');
     }
   };
+
   const saveDataToStorage = async userDetails => {
     try {
       const dataToStore = {
