@@ -8,7 +8,6 @@ import Index from './Components/Index';
 import Intro from './Components/Intro';
 import {CartProvider} from './Components/ShopContext';
 import MyOrders from './Components/MyOrders';
-import MyOrdersDatas from './Components/MyOrdersDatas';
 
 const App = () => {
   const Stack = createStackNavigator();
@@ -21,7 +20,6 @@ const App = () => {
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="Index" component={Index} />
           <Stack.Screen name="Myorders" component={MyOrders} />
-          <Stack.Screen name="MyOrdersDatas5" component={MyOrdersDatas} />
         </Stack.Navigator>
       </NavigationContainer>
     </CartProvider>

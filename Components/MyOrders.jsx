@@ -99,6 +99,7 @@ const MyOrders = ({navigation}) => {
                   justifyContent: 'space-evenly',
                   borderRadius: 10,
                   elevation: 3,
+
                 }}>
                 <Image source={require('../imgs/person.png')} />
                 <View
@@ -184,6 +185,8 @@ const MyOrders = ({navigation}) => {
                     marginTop: 8,
                     marginLeft: 10,
                     borderRadius: 6,
+                    marginBottom:5,
+                    // elevation:1
                   }}
                   key={itemIndex}>
                   <Image style={{width: 30, height: 30}} source={item.img} />

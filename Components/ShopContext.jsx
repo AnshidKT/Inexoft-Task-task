@@ -23,6 +23,45 @@ export const CartProvider = ({children}) => {
   const [yourOrdersData, setYourOrderData] = useState(false);
 
   const [isSecondModalVisible, setSecondModalVisible] = useState(false);
+
+  const [name, setName] = useState('');
+  const [place, setPlace] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [placeError, setPlaceError] = useState('');
+  const [phoneNumberError, setPhoneNumberError] = useState('');
+  const [orderConfirmed, setOrderConfirmed] = useState(false);
+  const [validationEnabled, setValidationEnabled] = useState(true);
+
+  const handleOrderNow = () => {
+    if (validationEnabled) {
+      if (!name) {
+        setNameError('Name is required');
+      } else {
+        setNameError('');
+      }
+      if (!place) {
+        setPlaceError('Place is required');
+      } else {
+        setPlaceError('');
+      }
+      if (!phoneNumber) {
+        setPhoneNumberError('Phone Number is required');
+      } else {
+        setPhoneNumberError('');
+      }
+    }
+
+    if (name && place && phoneNumber) {
+      setValidationEnabled(false);
+      saveDataToStorage(name, phoneNumber, place);
+      setOrderConfirmed(true);
+      setName('');
+      setPlace('');
+      setPhoneNumber('');
+    }
+  };
+
   const toggleSecondModal = () => {
     setSecondModalVisible(!isSecondModalVisible);
   };
@@ -107,44 +146,6 @@ export const CartProvider = ({children}) => {
   };
 
   let price = coupendiscount();
-
-  const [name, setName] = useState('');
-  const [place, setPlace] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [placeError, setPlaceError] = useState('');
-  const [phoneNumberError, setPhoneNumberError] = useState('');
-  const [orderConfirmed, setOrderConfirmed] = useState(false);
-  const [validationEnabled, setValidationEnabled] = useState(true);
-
-  const handleOrderNow = () => {
-    if (validationEnabled) {
-      if (!name) {
-        setNameError('Name is required');
-      } else {
-        setNameError('');
-      }
-      if (!place) {
-        setPlaceError('Place is required');
-      } else {
-        setPlaceError('');
-      }
-      if (!phoneNumber) {
-        setPhoneNumberError('Phone Number is required');
-      } else {
-        setPhoneNumberError('');
-      }
-    }
-
-    if (name && place && phoneNumber) {
-      setValidationEnabled(false);
-      saveDataToStorage(name, phoneNumber, place);
-      setOrderConfirmed(true);
-      setName('');
-      setPlace('');
-      setPhoneNumber('');
-    }
-  };
 
   const saveDataToStorage = async userDetails => {
     try {
